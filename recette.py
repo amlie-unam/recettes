@@ -31,7 +31,8 @@ if onglet == "🎲 Roulette de recettes":
             ligne = pool.sample(1).iloc[0]
             st.success(f"👉 {ligne['nom']} ({ligne['type']})")
 
-            pdf_path = f"recettes_pdf/{ligne['pdf']}"
+           pdf_path = ligne['pdf']
+
 
             st.markdown("### 📄 Fiche recette")
             components.html(
