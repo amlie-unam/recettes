@@ -4,7 +4,9 @@ import random
 import streamlit.components.v1 as components
 
 # === Chargement des données ===
-df = pd.read_csv("recettes.csv")
+# Ajoute ce paramètre si tu gardes le point-virgule
+df = pd.read_csv("recettes.csv", sep=";")
+
 
 # === UI avec onglets ===
 onglet = st.sidebar.radio("Navigation", ["🎲 Roulette de recettes", "📋 Recos nutrition"])
