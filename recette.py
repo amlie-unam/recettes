@@ -3,7 +3,7 @@ import pandas as pd
 import random
 
 # Charger les recettes
-df = pd.read_csv("recettes.csv")
+df = pd.read_csv("recettes.csv", sep=";")
 
 st.title("🎲 Roulette à Recettes")
 st.subheader("Choisis un type de repas et tire une recette au hasard !")
