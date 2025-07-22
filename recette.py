@@ -2,11 +2,10 @@ import streamlit as st
 import pandas as pd
 import random
 import streamlit.components.v1 as components
+import os
 
 # === Chargement des données ===
-# Ajoute ce paramètre si tu gardes le point-virgule
 df = pd.read_csv("recettes.csv", sep=";")
-
 
 # === UI avec onglets ===
 onglet = st.sidebar.radio("Navigation", ["🎲 Roulette de recettes", "📋 Recos nutrition"])
@@ -16,7 +15,7 @@ if onglet == "🎲 Roulette de recettes":
     st.title("🎲 Roulette à Recettes")
     st.subheader("Tire une recette au hasard selon le type de repas")
 
-    types_dispo = ["Tous"] + sorted(df["type"].unique())
+    types_dispo = ["Tous"] + sorted(df["type"].dropna().unique())
     choix = st.selectbox("🍽️ Type de repas :", types_dispo)
 
     # Filtrage
@@ -31,23 +30,25 @@ if onglet == "🎲 Roulette de recettes":
             ligne = pool.sample(1).iloc[0]
             st.success(f"👉 {ligne['nom']} ({ligne['type']})")
 
-           pdf_path = ligne['pdf']
-
-
-            st.markdown("### 📄 Fiche recette")
-            components.html(
-                f'<iframe src="{pdf_path}" width="700" height="500"></iframe>',
-                height=520,
-            )
-
-            # Téléchargement
-            with open(pdf_path, "rb") as f:
-                st.download_button(
-                    label="📥 Télécharger la fiche PDF",
-                    data=f,
-                    file_name=ligne['pdf'],
-                    mime="application/pdf"
-                )
+            if isinstance(ligne["pdf"], str) and ligne["pdf"].strip() != "":
+                pdf_path = ligne["pdf"]
+                if os.path.exists(pdf_path):
+                    st.markdown("### 📄 Fiche recette")
+                    components.html(
+                        f'<iframe src="{pdf_path}" width="700" height="500"></iframe>',
+                        height=520,
+                    )
+                    with open(pdf_path, "rb") as f:
+                        st.download_button(
+                            label="📥 Télécharger la fiche PDF",
+                            data=f,
+                            file_name=ligne["pdf"],
+                            mime="application/pdf"
+                        )
+                else:
+                    st.warning("📁 PDF mentionné mais introuvable.")
+            else:
+                st.info("Aucun PDF disponible pour cette recette.")
         else:
             st.warning("Aucune recette trouvée pour ce type.")
 
@@ -80,4 +81,3 @@ elif onglet == "📋 Recos nutrition":
     st.markdown("- 1 fruit **ou** 1 laitage")
 
     st.caption("👩‍⚕️ Perrine Errard – Diététicienne-Nutritionniste Agréée")
-
